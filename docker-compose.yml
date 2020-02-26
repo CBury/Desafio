@@ -1,33 +1,44 @@
-version: "3"
-services:
-  server:
-    container_name: flask
-    build: .
-    ports: ['5000:5000']
-    volumes: ['.:/usr/src/app']
-    restart: always
-    environment:
-      ENV: DEVELOPMENT
-      DB_USERNAME: username
-      DB_PASSWORD: password
-      DB_DATABASE: database_name
-      DB_HOST: localhost
-    links:
-      - database
-  database:
-    container_name: database
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_DATABASE: database_name
-      MYSQL_USER: username
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
-    ports:
-      - '3306:3306'
-    expose:
-      - '3306'
-    volumes:
-      - flask-db:/var/lib/mysql
+version: '2'
+
 volumes:
-  flask-db:
+
+    mysql-data-debts:
+      driver: local
+
+
+services:
+
+  mysql:
+    image: mysql
+    hostname: mysql
+    restart: always
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+       - MYSQL_ROOT_PASSWORD=secret
+       - MYSQL_DATABASE=db_a
+       - MYSQL_USER=admin
+       - MYSQL_PASSWORD=passwd
+    volumes:
+      - mysql-data-debts:/var/lib/mysql
+
+
+  data-debts:
+    restart: 'no'
+    container_name: data-debts
+    volumes:
+      - ./data_debts:/app
+    build:
+      context: ./data_debts
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    env_file:
+      - ./data_debts/.env
+    links:
+      - mysql
+    expose:
+      - 5000
+    ports:
+      - 5000:5000

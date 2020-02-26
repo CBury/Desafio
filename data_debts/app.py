@@ -3,9 +3,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_graphql import GraphQLView
-from data_debts import models
-from data_debts.schemas import schema
-from flask_graphql_auth import GraphQLAuth
+from schemas import schema
 from flask_jwt_extended import JWTManager, create_refresh_token, \
     jwt_refresh_token_required, create_access_token, fresh_jwt_required, \
     jwt_required, JWTManager
@@ -75,6 +73,7 @@ app.add_url_rule(
     ))
 )
 
+
 def create_app():
     db.init_app(app)
     @app.before_first_request
@@ -88,4 +87,4 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

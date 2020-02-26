@@ -1,6 +1,6 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from data_debts.models import Person, Debt
+from models import Person, Debt
 from flask_graphql_auth import AuthInfoField, query_jwt_required
 
 
