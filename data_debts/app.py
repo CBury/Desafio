@@ -15,9 +15,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.debug = True
 # Configs
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '$hAdOw8rUn5'
+app.config['MYSQL_HOST'] = 'mysql'
+app.config['MYSQL_USER'] = 'my_user'
+app.config['MYSQL_PASSWORD'] = 'my_pass'
 app.config['MYSQL_DB'] = 'db_a'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://{}:{}@{}/{}'.format(app.config['MYSQL_USER'], app.config['MYSQL_PASSWORD'], app.config['MYSQL_HOST'], app.config['MYSQL_DB'])
 
@@ -68,7 +68,7 @@ app.add_url_rule(
     view_func=jwt_required(GraphQLView.as_view(
         'graphql',
         schema=schema,
-        graphiql=True, # for having the GraphiQL interface
+        graphiql=True,
         get_context=lambda: {'session': db.session}
     ))
 )
