@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import mysql.connector
+from sqlalchemy.exc import IntegrityError
 
 
 Base = declarative_base()
@@ -33,38 +35,45 @@ class Debt(Base):
         return '<Debt: value:{}, company:{}, status:{}, debtor:{}>'.format(self.value, self.company, self.status, self.debtor_cpf)
 
 def init_db():
-    url = 'mysql://{}:{}@{}'.format('root', '$hAdOw8rUn5', '127.0.0.1:3306')
-    engine = create_engine(url)  # connect to server
-    create_str = "CREATE DATABASE IF NOT EXISTS {}; USE db_a".format('db_a')
-    engine.execute(create_str)
+    cnx = mysql.connector.connect(user='root', password='root', host='mysql', database='db_a')
+    cursor = cnx.cursor()
+    create_str = "ALTER USER my_user IDENTIFIED WITH mysql_native_password BY 'my_pass';"
+    cursor.execute(create_str)
+    create_str = "CREATE DATABASE IF NOT EXISTS {}; USE {}".format('db_a', 'db_a')
+    cursor.execute(create_str)
+    cnx.close()
 
-    # import yourapplication.models
+    url = 'mysql://{}:{}@{}/{}'.format('my_user', 'my_pass', 'mysql', 'db_a')
+    engine = create_engine(url)
+    # Person.__table__.create(bind=engine, checkfirst=True)
     Base.metadata.create_all(bind=engine)
-
-    # Create a test user
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    john = Person(cpf='12312312345', name='John Doe', address='Rua Teste 44')
-    debt = Debt(value=545, company='Vivo', description='conta de telefone',
-                date=datetime.datetime.strptime('2019-12-06', '%Y-%m-%d'), status='EM ABERTO')
-    debt.debtor = john
-    session.add(debt)
-    session.add(john)
-    jane = Person(cpf='89089089076', name='Jane Doe', address='Rua Teste 44')
-    debt2 = Debt(value=765, company='Eletropaulo', description='conta de energia',
-                 date=datetime.datetime.strptime('2019-09-04', '%Y-%m-%d'), status='EM ABERTO')
-    debt3 = Debt(value=134, company='Comgas', description='conta de gás',
-                 date=datetime.datetime.strptime('2018-11-17', '%Y-%m-%d'), status='EM ABERTO')
-    debt2.debtor = jane
-    debt3.debtor = jane
-    session.add(debt2)
-    session.add(debt3)
-    session.add(jane)
-    session.commit()
-    Person.query.all()
-    Debt.query.all()
-    session.commit()
+    try:
+        john = Person(cpf='12312312345', name='John Doe', address='Rua Teste 44')
+        debt = Debt(value=545, company='Vivo', description='conta de telefone',
+                    date=datetime.datetime.strptime('2019-12-06', '%Y-%m-%d'), status='EM ABERTO')
+        debt.debtor = john
+        session.add(debt)
+        session.add(john)
+        session.commit()
+    except IntegrityError as e:
+        session.rollback()
+    try:
+        jane = Person(cpf='89089089076', name='Jane Doe', address='Rua Teste 44')
+        debt2 = Debt(value=765, company='Eletropaulo', description='conta de energia',
+                     date=datetime.datetime.strptime('2019-09-04', '%Y-%m-%d'), status='EM ABERTO')
+        debt3 = Debt(value=134, company='Comgas', description='conta de gás',
+                     date=datetime.datetime.strptime('2018-11-17', '%Y-%m-%d'), status='EM ABERTO')
+        debt2.debtor = jane
+        debt3.debtor = jane
+        session.add(debt2)
+        session.add(debt3)
+        session.add(jane)
+        session.commit()
+    except IntegrityError as e:
+        session.rollback()
 
 
 if __name__ == '__main__':

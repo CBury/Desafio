@@ -7,7 +7,7 @@ from schemas import schema
 from flask_jwt_extended import JWTManager, create_refresh_token, \
     jwt_refresh_token_required, create_access_token, fresh_jwt_required, \
     jwt_required, JWTManager
-
+from models import init_db
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -87,4 +87,5 @@ def create_app():
     return app
 
 if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0')
