@@ -18,7 +18,7 @@ class Query(graphene.ObjectType):
     def resolve_find_event(self, info, **args):
         cpf = args.get("cpf")
         query = EventObject.get_query(info)
-        return query.filter(DocumentEvents.cpf == cpf)
+        return query.filter(DocumentEvents.cpf == cpf).first()
 
 
 schema = graphene.Schema(query=Query, types=[EventObject])

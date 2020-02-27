@@ -25,8 +25,12 @@ A conecção entre o GraphQL e o micro serviço é feita por JWT para os micro s
 ## Como executar o projeto
 Instalar docker
 ### Micro serviço A
-* Acessar: http://127.0.0.1:5000/login com username: 'admin' e password: 'desafio123' para o código de autenticação.
-* Acessar: http://127.0.0.1:5000/graphql com a autenticação do passo anterior.
+```
+sudo docker-compose build mysql data-debts
+sudo docker-compose up mysql data-debts
+```
+* Acessar: http://0.0.0.0:5000/login com username: 'admin' e password: 'desafio123' para o código de autenticação.
+* Acessar: http://0.0.0.0:5000/graphql com a autenticação do passo anterior.
 
 Exemplos de buscas: 
 * Para acessar todas as dívidas na base de dados:
@@ -97,7 +101,84 @@ Exemplos de buscas:
 }
 ```
 ### Micro serviço B
+
+```
+sudo docker-compose build mysql_b score
+sudo docker-compose up mysql_b score
+```
+* Acessar: http://0.0.0.0:5000/login com username: 'admin' e password: 'desafio123' para o código de autenticação.
+* Acessar: http://0.0.0.0:5000/graphql com a autenticação do passo anterior.
+
+Exemplos de buscas: 
+* Para acessar todos os bens na base de dados:
+```
+{
+  allAssets{
+    edges{
+      node{
+        value
+        description
+        owner{
+          cpf
+          name
+          address
+        }
+      }
+    }
+  }
+}
+```
+* Para acessar todas as pessoas com os respectivos bens:
+```
+{
+  allPersons{
+    edges{
+      node{
+        cpf
+        name
+        address
+        assets{
+          edges{
+            node{
+              value
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+* Para buscar um CPF específico:
+```
+{search(q: "12312312345") {
+    __typename
+    ... on PersonObject {
+      cpf
+      name
+      address
+      assets {
+        edges {
+          node {
+            value
+            description
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ### Micro serviço C
+```
+sudo docker-compose build mysql_c document-events
+sudo docker-compose up mysql_c document-events
+```
+
+* Acessar: http://0.0.0.0:5000/graphql
+
 * Para buscar todos os eventos:
 ```
 {
@@ -115,7 +196,11 @@ Exemplos de buscas:
 ```
 * Para buscar um CPF específico:
 ```
-{
-  
+query{
+  findEvent(cpf: "12312312345") {
+    lastQuery
+    financialTransactions
+    lastBuy
+  }
 }
 ```

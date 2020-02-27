@@ -28,10 +28,8 @@ app.config['JWT_REFRESH_COOKIE_PATH'] = '/auth/refresh'
 jwt_manager = JWTManager(app)
 client = app.test_client()
 
-app.config["JWT_SECRET_KEY"] = "something"  # change this!
+app.config["JWT_SECRET_KEY"] = "something"
 jwt = JWTManager(app)
-# app.config["REFRESH_EXP_LENGTH"] = 30
-# app.config["ACCESS_EXP_LENGTH"] = 10
 
 db = SQLAlchemy(app)
 

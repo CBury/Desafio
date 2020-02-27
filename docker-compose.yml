@@ -32,7 +32,7 @@ services:
     restart: always
     container_name: mysql_b
     ports:
-      - 3306:3306
+      - 3307:3307
     environment:
        - MYSQL_ROOT_PASSWORD=root
        - MYSQL_DATABASE=db_b

@@ -51,8 +51,6 @@ class Query(graphene.ObjectType):
 
         return objs
 
-    # protected = graphene.Field(type=ProtectedUnion, token=graphene.String())
-
     @query_jwt_required
     def resolve_protected(self, info):
         return MessageField(message="Hello World!")
