@@ -97,3 +97,25 @@ Exemplos de buscas:
 }
 ```
 ### Micro serviço B
+### Micro serviço C
+* Para buscar todos os eventos:
+```
+{
+  allEvents{
+    edges{
+      node{
+        cpf
+        lastQuery
+        financialTransactions
+        lastBuy
+      }
+    }
+  }
+}
+```
+* Para buscar um CPF específico:
+```
+{
+  
+}
+```

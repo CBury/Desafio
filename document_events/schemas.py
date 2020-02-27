@@ -1,6 +1,6 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from document_events.models import DocumentEvents
+from models import DocumentEvents
 from flask_graphql_auth import AuthInfoField
 
 
@@ -10,37 +10,16 @@ class EventObject(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node, )
 
 
-class SearchResult(graphene.Union):
-    class Meta:
-        types = (EventObject)
-
-
-class MessageField(graphene.ObjectType):
-    message = graphene.String()
-
-
-class ProtectedUnion(graphene.Union):
-    class Meta:
-        types = (MessageField, AuthInfoField)
-
-    @classmethod
-    def resolve_type(cls, instance, info):
-        return type(instance)
-
-
 class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
     all_events = SQLAlchemyConnectionField(EventObject)
-    event = graphene.Field(lambda: EventObject, cpf=graphene.String())
-    search = graphene.List(SearchResult, q=graphene.String())
+    find_event = graphene.Field(EventObject, cpf=graphene.String())
 
-    def resolve_search(self, info, **args):
-        q = args.get("q")
+    def resolve_find_event(self, info, **args):
+        cpf = args.get("cpf")
         query = EventObject.get_query(info)
-        query = query.filter(DocumentEvents.cpf == q)
-        objs = query.all()
+        return query.filter(DocumentEvents.cpf == cpf)
 
-        return objs
 
-schema = graphene.Schema(query=Query, types=[EventObject, SearchResult])
+schema = graphene.Schema(query=Query, types=[EventObject])
 

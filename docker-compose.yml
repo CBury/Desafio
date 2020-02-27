@@ -6,7 +6,8 @@ volumes:
       driver: local
     mysql-score:
       driver: local
-
+    mysql-document-events:
+      driver: local
 
 services:
 
@@ -38,7 +39,22 @@ services:
        - MYSQL_USER=my_user
        - MYSQL_PASSWORD=my_pass
     volumes:
-      - mysql-data-debts:/var/lib/mysql_b
+      - mysql-score:/var/lib/mysql_b
+
+  mysql_c:
+    image: mysql
+    hostname: mysql_c
+    restart: always
+    container_name: mysql_c
+    ports:
+      - 3308:3308
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=db_c
+      - MYSQL_USER=my_user
+      - MYSQL_PASSWORD=my_pass
+    volumes:
+      - mysql-document-events:/var/lib/mysql_c
 
   data-debts:
     restart: 'no'
@@ -73,6 +89,25 @@ services:
       - ./score/.env
     links:
       - mysql_b
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+
+  document-events:
+    restart: 'no'
+    container_name: document-events
+    volumes:
+      - ./document_events:/app
+    build:
+      context: ./document_events
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_c
+    env_file:
+      - ./document_events/.env
+    links:
+      - mysql_c
     expose:
       - 5000
     ports:
