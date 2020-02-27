@@ -4,6 +4,8 @@ volumes:
 
     mysql-data-debts:
       driver: local
+    mysql-score:
+      driver: local
 
 
 services:
@@ -23,6 +25,20 @@ services:
     volumes:
       - mysql-data-debts:/var/lib/mysql
 
+  mysql_b:
+    image: mysql
+    hostname: mysql_b
+    restart: always
+    container_name: mysql_b
+    ports:
+      - 3306:3306
+    environment:
+       - MYSQL_ROOT_PASSWORD=root
+       - MYSQL_DATABASE=db_b
+       - MYSQL_USER=my_user
+       - MYSQL_PASSWORD=my_pass
+    volumes:
+      - mysql-data-debts:/var/lib/mysql_b
 
   data-debts:
     restart: 'no'
@@ -38,6 +54,25 @@ services:
       - ./data_debts/.env
     links:
       - mysql
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+
+  score:
+    restart: 'no'
+    container_name: score
+    volumes:
+      - ./score:/app
+    build:
+      context: ./score
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_b
+    env_file:
+      - ./score/.env
+    links:
+      - mysql_b
     expose:
       - 5000
     ports:

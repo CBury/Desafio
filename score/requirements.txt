@@ -7,4 +7,8 @@ graphene
 graphene-sqlalchemy
 mysqlclient
 Flask-GraphQL-Auth
-flask_jwt
+PyJWT==1.6.4
+flask_jwt_extended
+python-dotenv
+mysql
+mysql-connector-python

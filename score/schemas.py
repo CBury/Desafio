@@ -1,6 +1,6 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from score.models import Person, Asset
+from models import Person, Asset
 from flask_graphql_auth import AuthInfoField, query_jwt_required
 
 
