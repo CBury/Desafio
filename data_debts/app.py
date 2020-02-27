@@ -28,13 +28,10 @@ app.config['JWT_REFRESH_COOKIE_PATH'] = '/auth/refresh'
 jwt_manager = JWTManager(app)
 client = app.test_client()
 
-app.config["JWT_SECRET_KEY"] = "something"  # change this!
+app.config["JWT_SECRET_KEY"] = "something"
 jwt = JWTManager(app)
-# app.config["REFRESH_EXP_LENGTH"] = 30
-# app.config["ACCESS_EXP_LENGTH"] = 10
 
 db = SQLAlchemy(app)
-
 
 # Routes
 @jwt.expired_token_loader
@@ -58,11 +55,6 @@ def login():
     return jsonify(ret), 200
 
 
-@app.route('/protected', methods=['GET'])
-@jwt_required
-def protected():
-    return jsonify({'hello': 'world'}), 200
-
 app.add_url_rule(
     '/graphql',
     view_func=jwt_required(GraphQLView.as_view(
@@ -73,18 +65,6 @@ app.add_url_rule(
     ))
 )
 
-
-def create_app():
-    db.init_app(app)
-    @app.before_first_request
-    def initialize_database():
-        """ Create all tables """
-        db.create_all()
-
-    @app.teardown_appcontext
-    def shutdown_session(exception=None):
-        db.session.remove()
-    return app
 
 if __name__ == '__main__':
     init_db()

@@ -45,7 +45,6 @@ def init_db():
 
     url = 'mysql://{}:{}@{}/{}'.format('my_user', 'my_pass', 'mysql', 'db_a')
     engine = create_engine(url)
-    # Person.__table__.create(bind=engine, checkfirst=True)
     Base.metadata.create_all(bind=engine)
     Session = sessionmaker(bind=engine)
     session = Session()
